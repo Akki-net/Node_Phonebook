@@ -66,8 +66,29 @@ app.post('/api/persons', (req,res) => {
         return parseInt(Math.random() * 100);
     };
 
-    const person = req.body;
-    person.id = getRandId();
+    const body = req.body;
+
+    if(!body.name || !body.number){
+        res.status(400).json({
+            error: "no content"
+        })
+    }
+    else{
+        persons.filter(p => {
+            if(p.name === body.name){
+        res.status(400).json({
+            error: 'name must be unique'
+        })
+        }
+    })
+    }
+
+    const person = {
+        id: getRandId(),
+        name: body.name,
+        number: body.number
+    };
+
     const newObj = persons.concat(person);
     res.json(newObj);
 });
