@@ -8,22 +8,22 @@ let persons = [
     { 
         id: 1,
         name: "Arto Hellas", 
-        number: "040-123456"
+        number: "0470123456"
       },
       { 
         id: 2,
         name: "Ada Lovelace", 
-        number: "39-44-5323523"
+        number: "3945323523"
       },
       { 
         id: 3,
         name: "Dan Abramov", 
-        number: "12-43-234345"
+        number: "1432344345"
       },
       { 
         id: 4,
         name: "Mary Poppendieck", 
-        number: "39-23-6423122"
+        number: "3946423122"
       }
 ];
 
@@ -59,6 +59,17 @@ app.delete('/api/persons/:id', (req,res) => {
     const id = Number(req.params.id);
     persons = persons.filter(p => p.id !== id);
     res.status(202).end()
+});
+
+app.post('/api/persons', (req,res) => {
+    const getRandId = () => {
+        return parseInt(Math.random() * 100);
+    };
+
+    const person = req.body;
+    person.id = getRandId();
+    const newObj = persons.concat(person);
+    res.json(newObj);
 });
 
 const Port = 3001;
