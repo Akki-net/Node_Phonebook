@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const app = express();
 
 app.use(express.json());
-app.use(morgan('tiny'));
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
 let persons = [
     { 
@@ -90,8 +90,9 @@ app.post('/api/persons', (req,res) => {
         name: body.name,
         number: body.number
     };
-
+    
     const newObj = persons.concat(person);
+    morgan.token('body', (req, res) => JSON.stringify(person));
     res.json(newObj);
 });
 
