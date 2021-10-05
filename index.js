@@ -99,7 +99,7 @@ app.post('/api/persons', (req,res) => {
     app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 });
 
-const Port = 3001;
+const Port = process.env.PORT || 3001;
 app.listen(Port,() => {
     console.log(`Server is running on Port ${Port}`)
 });
