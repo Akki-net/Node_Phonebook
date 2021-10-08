@@ -1,6 +1,8 @@
+require('dotenv').config();
 const { application } = require('express');
 const express = require('express');
 const morgan = require('morgan');
+const Person = require('./models/person');
 const cors = require('cors');
 const app = express();
 
@@ -9,43 +11,22 @@ app.use(express.json());
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 app.use(express.static('build'));
 
-let persons = [
-    { 
-        id: 1,
-        name: "Arto Hellas", 
-        number: "0470123456"
-      },
-      { 
-        id: 2,
-        name: "Ada Lovelace", 
-        number: "3945323523"
-      },
-      { 
-        id: 3,
-        name: "Dan Abramov", 
-        number: "1432344345"
-      },
-      { 
-        id: 4,
-        name: "Mary Poppendieck", 
-        number: "3946423122"
-      }
-];
-
 app.get('/',(req, res) => {
     res.send('<h1>Hello World</h1>')
 });
 
 app.get('/api/persons', (req, res) => {
-    res.json(persons)
+    Person.find().then(result => res.json(result))
 });
 
 app.get('/info', (req, res) => {
-    const len = persons.length;
-    const d = new Date();
-    const str = `<div> <p>Phonebook has info for ${len} people</p>
-    <p> ${d.toString()} </p> </div>`;
-    res.send(str)
+    Person.find().then(returnedObj => {
+        const len = returnedObj.length;
+        const d = new Date();
+        const str = `<div> <p>Phonebook has info for ${len} people</p>
+                     <p> ${d.toString()} </p> </div>`;
+        res.send(str);
+    })
 });
 
 app.get('/api/persons/:id', (req,res) => {
