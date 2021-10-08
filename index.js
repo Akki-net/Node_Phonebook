@@ -2,6 +2,7 @@ require('dotenv').config();
 const { application } = require('express');
 const express = require('express');
 const morgan = require('morgan');
+const mongoose = require('mongoose');
 const Person = require('./models/person');
 const cors = require('cors');
 const app = express();
@@ -16,7 +17,9 @@ app.get('/',(req, res) => {
 });
 
 app.get('/api/persons', (req, res) => {
-    Person.find().then(result => res.json(result))
+    Person.find().then(result => {
+        res.json(result);  
+    })
 });
 
 app.get('/info', (req, res) => {
@@ -48,37 +51,23 @@ app.delete('/api/persons/:id', (req,res) => {
 });
 
 app.post('/api/persons', (req,res) => {
-    const getRandId = () => {
-        return parseInt(Math.random() * 100);
-    };
-
     const body = req.body;
 
     if(!body.name || !body.number){
-        res.status(400).json({
+        return res.status(400).json({
             error: "no content"
         })
     }
-    else{
-        persons.filter(p => {
-            if(p.name === body.name){
-        res.status(400).json({
-            error: 'name must be unique'
-        })
-        }
-    })
-    }
 
-    const person = {
-        id: getRandId(),
+    const person = new Person({
         name: body.name,
         number: body.number
-    };
+    });
     
-    const newObj = persons.concat(person);
-    morgan.token('body', (req, res) => JSON.stringify(person));
-    res.json(newObj);
-    app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
+    person.save().then(savedPerson => {
+        morgan.token('body', (req, res) => JSON.stringify(savedPerson));
+        res.json(savedPerson);
+    })
 });
 
 const Port = process.env.PORT || 3001;
