@@ -9,6 +9,15 @@ const app = express();
 app.use(cors());
 app.use(express.static('build'));
 app.use(express.json());
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message);
+    if(error.name == 'CastError'){
+        return response.status(400).send({error: 'malformatted id'})
+    }
+    next(error)
+};
+
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 
 app.get('/api/persons', (req, res) => {
@@ -44,12 +53,7 @@ app.delete('/api/persons/:id', (req,res) => {
     .then(result => {
         res.status(204).end()
     })
-    .catch(error => {
-        console.error(error.message);
-        if(error.name == 'CastError'){
-            return response.status(400).send({error: 'malformatted id'})
-        }
-    })
+    .catch(error => next(error))
 });
 
 app.post('/api/persons', (req,res) => {
@@ -71,6 +75,13 @@ app.post('/api/persons', (req,res) => {
         res.json(savedPerson);
     })
 });
+
+const unknownEndPoint = (request, response) => {
+    response.status(404).send({error: 'unknown endpoint'})
+};
+
+app.use(unknownEndPoint);
+app.use(errorHandler);
 
 const Port = process.env.PORT || 3001;
 app.listen(Port,() => {
