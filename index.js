@@ -7,13 +7,9 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors());
+app.use(express.static('build'));
 app.use(express.json());
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
-app.use(express.static('build'));
-
-app.get('/',(req, res) => {
-    res.send('<h1>Hello World</h1>')
-});
 
 app.get('/api/persons', (req, res) => {
     Person.find().then(result => {
@@ -44,9 +40,16 @@ app.get('/api/persons/:id', (req,res) => {
 });
 
 app.delete('/api/persons/:id', (req,res) => {
-    const id = Number(req.params.id);
-    persons = persons.filter(p => p.id !== id);
-    res.status(202).end()
+    Person.findByIdAndRemove(req.params.id)
+    .then(result => {
+        res.status(204).end()
+    })
+    .catch(error => {
+        console.error(error.message);
+        if(error.name == 'CastError'){
+            return response.status(400).send({error: 'malformatted id'})
+        }
+    })
 });
 
 app.post('/api/persons', (req,res) => {
