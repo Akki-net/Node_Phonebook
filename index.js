@@ -54,19 +54,20 @@ app.get('/api/persons/:id', (req,res,next) => {
     .catch(error => next(error))
 });
 
-app.delete('/api/persons/:id', (req,res) => {
+app.delete('/api/persons/:id', (req,res,next) => {
     Person.findByIdAndRemove(req.params.id)
     .then(result => {
         res.status(204).end()
     })
+    .catch(error => next(error))
 });
 
-app.post('/api/persons', (req,res,next) => {
+app.post('/api/persons', (req,res, next) => {
     const body = req.body;
 
     if(!body.name || !body.number){
         return res.status(400).json({
-            error: "no content"
+            error: "missing content"
         })
     }
 
